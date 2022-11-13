@@ -4,8 +4,11 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import serial
+import time
 
 
+ser = serial.Serial('/dev/cu.usbmodem14101', baudrate=115200, timeout=1)
 dataSet = pd.read_csv('modelCreation/fullDataset.csv')
 conv_arr= dataSet.values
 X = dataSet.drop(columns='handstate').values
@@ -15,17 +18,13 @@ x_trained, x_test, y_trained, y_test = train_test_split(X, y, train_size=0.8, te
 model = KNeighborsClassifier(n_neighbors=5)
 model.fit(x_trained, y_trained)
 
-predictions = model.predict(x_test)
-predictionsDf = pd.DataFrame(predictions.tolist())
-predictionsDf.to_csv('predictions.csv')
-print(predictionsDf.head(10))
-acc = accuracy_score(y_test, predictions)
-print(acc)
 
-values = np.delete(conv_arr,[1,2],axis=1) 
-values_squared = np.delete(conv_arr,[0,1],axis=1) 
-values = values.ravel()
-values_squared = values_squared.ravel()
-
-plt.scatter(x = dataSet["values"].values.flatten(), y = dataSet["values_squared"].values.flatten())
-plt.show()
+while True:
+    data = str(ser.readline())
+    data = data.replace('b', '')
+    data = data.replace('\'', '')
+    data = data.replace('\\', '')
+    data = data.replace('rn', '')
+    data = pd.DataFrame({"data0":[data],"data1":[data]})
+    predictions = model.predict(data.values)
+    print(predictions)
