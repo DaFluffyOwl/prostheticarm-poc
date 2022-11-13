@@ -1,9 +1,10 @@
-# main.py -- put your code here!
-from machine import Pin, Timer
-led = Pin(25, Pin.OUT)
-timer = Timer()
+from machine import Pin, ADC
+from time import sleep
 
-def blink(timer):
-    led.toggle()
+pot = ADC(Pin(26))
 
-timer.init(freq=2.5, mode=Timer.PERIODIC, callback=blink)
+while True:
+  pot_value = pot.read_u16()
+  if pot_value < 40000:
+    print(pot_value)
+  sleep(0.001)
