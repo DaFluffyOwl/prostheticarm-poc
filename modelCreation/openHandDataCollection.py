@@ -9,26 +9,28 @@ temp_list_open = []
 temp_list_closed = []
 for i in range(0, 4):
     for j in range(0, 1000):
-            data = str(ser.readline())
-            data = data.replace('b', '')
-            data = data.replace('\'', '')
-            data = data.replace('\\', '')
-            data = data.replace('rn', '')
-            temp_list_open.append(data)
+            A = str(ser.readline())
+            A = A.replace('b', '')
+            A = A.replace('\'', '')
+            A = A.replace('\\', '')
+            A = A.replace('rn', '')
+            
+            temp_list_open.append(A)
             print(j)
     for x in range(0, 1000):
-            data = str(ser.readline())
-            data = data.replace('b', '')
-            data = data.replace('\'', '')
-            data = data.replace('\\', '')
-            data = data.replace('rn', '')
-            temp_list_closed.append(data)
+            A = str(ser.readline())
+            A = A.replace('b', '')
+            A = A.replace('\'', '')
+            A = A.replace('\\', '')
+            A = A.replace('rn', '')
+            temp_list_closed.append(A)
+
             print(x)
         
-opendf.insert(0, 'set' , temp_list_open)
-closedDf.insert(0, 'set', temp_list_closed)
+opendf.insert(0, 'values' , temp_list_open)
+closedDf.insert(0, 'values', temp_list_closed)
 
 
 print(opendf)
-opendf.to_csv('openhandDataset.csv')
-closedDf.to_csv('closedHandDataCollection.csv')
+opendf.to_csv('openhandDataset.csv', index=False)
+closedDf.to_csv('closedHandDataCollection.csv', index=False)
