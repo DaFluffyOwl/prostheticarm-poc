@@ -2,9 +2,6 @@ from machine import Pin, ADC, PWM
 from utime import sleep
 
 
-min = 1000000
-max = 2000000
-
 pot = ADC(Pin(26))
 stream = []
 pot_value = pot.read_u16()
@@ -16,13 +13,15 @@ else:
 sleep(0.08)
 for i in range(0, 8):
   stream.append(value)
-pwm = PWM(Pin(15))
-pwm.freq(50)
 while True:
+  min = 350000
+  max = 2000000
   pot_value = pot.read_u16()
   raw_value = abs(pot_value-30000)
-  sleep(0.08)
-  if raw_value >= 1000:
+  servo = PWM(Pin(15))
+  servo.freq(50)
+  sleep(0.01)
+  if raw_value >= 2000:
     value = 1
   else:
     value = 0
@@ -31,7 +30,7 @@ while True:
   avg = sum(stream)/8
   if avg >= 0.25:
     print(1)
-    pwm.duty_ns(max)
+    servo.duty_ns(max)
   else:
     print(0)
-    pwm.duty_ns(min)
+    servo.duty_ns(min)
