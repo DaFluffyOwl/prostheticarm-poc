@@ -18,7 +18,7 @@ def initStream(xList, data):
   return xList
 
 def updateStream(xList, data):
-  if data >= 2000:
+  if data >= 1000:
     value = 1
   else:
     value = 0
@@ -31,34 +31,38 @@ def initSer(pin):
   servo.freq(50)
   return servo
 
-def extend(ser):
-  ser.duty_ns(350000)
+def collaps():
+  pointer.duty_ns(2000000)
+  middle.duty_ns(350000)
+  ring.duty_ns(1900000)
+  pinky.duty_ns(550000)
   return False
 
-def collaps(ser):
-  ser.duty_ns(2000000)
-  return True
+def extend():
+ 	pointer.duty_ns(400000)
+	middle.duty_ns(2000000)
+	ring.duty_ns(350000)
+	pinky.duty_ns(2000000)
+	return True
 
-
+pointer = initSer(14)
+middle = initSer(15)
+ring = initSer(16)
+pinky = initSer(17)
 emg = initEmg(26)
+
 stream = []
 stream = initStream(stream, emg)
 
 
 while True:
-  min = 350000
-  max = 2000000
   emg = initEmg(26)
-  pointer = initSer(15)
-  pinky = initSer(14)
   sleep(0.01)
   stream = updateStream(stream, emg)
   avg = sum(stream)/8
   if avg >= 0.25:
     print(1)
-    collaps(pointer)
-    extend(pinky)
+    collaps()
   else:
     print(0)
-    extend(pointer)
-    collaps(pinky)
+    extend()
