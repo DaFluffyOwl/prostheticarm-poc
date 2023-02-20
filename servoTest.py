@@ -1,6 +1,6 @@
 from machine import Pin, PWM
 from time import sleep
-
+import sys
 
 def initSer(pin):
   servo = PWM(Pin(pin))
@@ -12,29 +12,34 @@ def collaps():
 	middle.duty_ns(350000)
 	ring.duty_ns(1900000)
 	pinky.duty_ns(550000)
-	return False
+	sleep(1)
+	thumb.duty_ns(1000000)
+	return True
 
 def extend():
+	thumb.duty_ns(1500000)
+	sleep(1)
  	pointer.duty_ns(400000)
 	middle.duty_ns(2000000)
 	ring.duty_ns(350000)
 	pinky.duty_ns(2000000)
-	return True
+	return False
 
 
 pointer = initSer(14)
 middle = initSer(15)
 ring = initSer(16)
 pinky = initSer(17)
+thumb = initSer(18)
 
-while True:
-	sleep(3)
-	extend()
-	print("open")
-	sleep(3)
-	collaps()
-	print("closed")
-	sleep(3)
+sleep(2)
+collaps()
+print("closed")
+sleep(5)
+extend()
+print("opened")
+sleep(2)
+sys.exit()
 
 
 #pointer works as intended
