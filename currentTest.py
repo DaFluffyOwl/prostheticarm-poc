@@ -22,5 +22,5 @@ def currentSensor(pin):
 	return currentAvg
 
 while True:
-	pinkyCurrent = currentSensor(27) #defining a sensor will always return the avg current
-	print(pinkyCurrent)
+	poiSen = currentSensor(27) #defining a sensor will always return the avg current
+	print(poiSen)

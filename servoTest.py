@@ -35,12 +35,10 @@ thumb = initSer(18)
 sleep(2)
 collaps()
 print("closed")
-print(initSensor())
 sleep(5)
 extend()
 print("opened")
 sleep(5)
-print(initSensor())
 sys.exit()
 
 
