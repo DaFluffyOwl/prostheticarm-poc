@@ -15,7 +15,8 @@ def currentSensor(pin):
 		sensor_voltage = (sensor_voltage - DEFAULT_OUTPUT_VOLTAGE) * 1000
 		dc_current = (sensor_voltage / MILLIVOLT_PER_AMPERE) - ERROR
 		currentList.append(dc_current)
-	currentAvg = sum(currentList) / len(currentList)
+        sleep(0.003)
+	currentAvg = abs(sum(currentList) / len(currentList))
 	return currentAvg
 
 
@@ -34,45 +35,47 @@ def collaps():
 	thumb.duty_ns(1000000)
 	return True
 
+
 def extend():
-	thumb.duty_ns(1500000)
+	thumb.duty_ns(1700000)
 	sleep(1)
- 	pointer.duty_ns(400000)
+ 	pointer.duty_ns(2000000)
 	middle.duty_ns(2000000)
 	ring.duty_ns(350000)
 	pinky.duty_ns(2000000)
 	return False
 
 
-pointer = initSer(14)
+pointer = initSer(15)
 middle = initSer(14)
-ring = initSer(16)
-pinky = initSer(15)
-thumb = initSer(18)
+ring = initSer(17)
+pinky = initSer(14)
+thumb = initSer(16)
 
 
 def poiCollaps():
-    for nsec in range(pointer.duty_ns(), 2000000, 20000):
-        poiSen = currentSensor(28)
-        if poiSen > 1.2:
+    for nsec in range(pointer.duty_ns(), 650000, -20000):
+        poiSen = round(currentSensor(27), 2)
+        if poiSen > 2:
             pointer.duty_ns((nsec - 100000))
             print(poiSen)
             print(pointer.duty_ns())
+            print("object grabbed")
             break
         else:
             pointer.duty_ns(nsec)
-            poiSen = currentSensor(28)
             print(pointer.duty_ns())
             print(poiSen)
     return True
 
 def ringCollaps():
-    for nsec in range(ring.duty_ns(), 2000000, 10000):
-        ringSen = currentSensor(27)
-        if ringSen > .8:
-            ring.duty_ns((nsec - 500000))
+    for nsec in range(ring.duty_ns(), 2000000, 50000):
+        ringSen = round(currentSensor(27), 2)
+        if ringSen > 2:
+            ring.duty_ns((nsec - 100000))
             print(ringSen)
             print(ring.duty_ns())
+            print("object grabbed")
             break
         else:
             ring.duty_ns(nsec)
@@ -81,12 +84,13 @@ def ringCollaps():
     return True
 
 def thumbCollaps():
-    for nsec in range(thumb.duty_ns(), 1000000, -1000):
-        thumbSen = currentSensor(26)
-        if thumbSen > .350:
-            thumb.duty_ns((nsec - 100000))
+    for nsec in range(thumb.duty_ns(), 500000, -20000):
+        thumbSen = round(currentSensor(28), 2)
+        if thumbSen > .750:
+            thumb.duty_ns((nsec - 10000))
             print(thumbSen)
             print(thumb.duty_ns())
+            print("object grabbed")
             break
         else:
             thumb.duty_ns(nsec)
@@ -96,12 +100,13 @@ def thumbCollaps():
 
 
 def pinkyCollaps():
-    for nsec in range(thumb.duty_ns(), 550000, -20000):
-        pinkySen = currentSensor(27)
-        if pinkySen > 1:
+    for nsec in range(thumb.duty_ns(), 550000, -50000):
+        pinkySen = round(currentSensor(26), 2)
+        if pinkySen > 2:
             pinky.duty_ns((nsec - 10000))
             print(pinkySen)
             print(pinky.duty_ns())
+            print("object grabbed")
             break
         else:
             pinky.duty_ns(nsec)
@@ -110,12 +115,13 @@ def pinkyCollaps():
     return True
 
 def midCollaps():
-    for nsec in range(middle.duty_ns(), 350000, -20000):
-        midSen = currentSensor(28)
-        if midSen > 1:
-            mid.duty_ns((nsec - 10000))
+    for nsec in range(middle.duty_ns(), 800000, -20000):
+        midSen = round(currentSensor(28), 2)
+        if midSen > 2:
+            middle.duty_ns((nsec - 10000))
             print(midSen)
             print(middle.duty_ns())
+            print("object grabbed")
             break
         else:
             middle.duty_ns(nsec)
@@ -125,14 +131,10 @@ def midCollaps():
 
 
 #_thread.start_new_thread(ringCollaps, ())
-midCollaps()
-#print(currentSensor(27))
-print(currentSensor(28))
-sleep(10)
-ring.duty_ns(400000)
-pointer.duty_ns(400000)
-thumb.duty_ns(1500000)
-pinky.duty_ns(2000000)
-middle.duty_ns(2000000)
-
+#ringCollaps()
+ringCollaps()
+sleep(5)
+print("closing")
+extend()
+sleep(2)
 sys.exit()

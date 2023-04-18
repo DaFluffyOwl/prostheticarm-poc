@@ -1,43 +1,34 @@
 from machine import Pin, ADC, PWM
 from utime import sleep
+import math
 
-def initEmg(pin):
-    voltageList = []
-    for i in range(0, 150):
-        voltage = sensor = ADC(Pin(pin))
-        data = sensor.read_u16()
-        voltage = data * 3.3 / 65535
-        voltageList.append(voltage)
-    voltageAvg = sum(voltageList)/ len(voltageList)
-    return voltageAvg
+def rms(xList):
+  xList.sort()
+  rms = xList[-1]/round((math.sqrt(2)/2), 4)
+  return round(rms, 1)
 
 def initStream(xList, data):
-  if data > 1.58 or data < 1.49:
-    value = 1
-  else:
-    value = 0
-  for i in range(0, 150):
-    xList.append(value)
+  for i in range(0, 100):
+    xList.append(data)
   return xList
 
 def updateStream(xList, data):
-  if data > 1.59 or data < 1.49:
-    value = 1
-  else:
-    value = 0
-  xList.append(value)
+  xList.append(data)
   xList.pop(0)
   return xList
 
 
-emg = initEmg(26)
 stream = []
-stream = initStream(stream, emg)
+stream = initStream(stream, 1)
 while True:
-    emg = initEmg(26)
-    stream = updateStream(stream, emg)
-    avg = sum(stream)/len(stream)
-    if avg >= 0.5:
-        print(1)
-    else:
-        print(0)
+  voltageList = []
+  for i in range(0, 100):
+    sensor = ADC(Pin(26))
+    data = sensor.read_u16()
+    voltage = (data / 65535) * 3.3
+    voltageList.append(voltage)
+  voltageRMS = rms(voltageList)
+  stream = updateStream(stream, voltageRMS)
+  avg = sum(stream)/len(stream)
+  avg = round(avg, 2)
+  print(avg)

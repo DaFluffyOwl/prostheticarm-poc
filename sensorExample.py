@@ -19,8 +19,8 @@ analogInputPin = ADC(27) # only one positional argument
                           # which is pin id
 
 current = []  
-for i in range (0, 149):
-    current.append(.5)
+for i in range (0, 300):
+    current.append(.1)
 
 # main logic of the program
 while True:
@@ -40,7 +40,7 @@ while True:
     dc_current = (sensor_voltage/ MILLIVOLT_PER_AMPERE) - ERROR# unit : Ampere
     current.append(dc_current)
     current.pop(0)
-    print(sum(current) / len(current))
+    print(abs(sum(current) / len(current)))
     
     utime.sleep(.01)# sleep is just for demonstration , vary it as per need
        
