@@ -10,11 +10,11 @@ def currentSensor(pin):
 	analogInputPin = ADC(pin) #Def ADC pin
 	currentList = [] #create a list for finding an average of 150 samples
 	for i in range(0, 150):
-		analogValue = ADC.read_u16(analogInputPin)
-		sensor_voltage = (analogValue / 65535) * AREF
-		sensor_voltage = (sensor_voltage - DEFAULT_OUTPUT_VOLTAGE) * 1000
-		dc_current = (sensor_voltage / MILLIVOLT_PER_AMPERE) - ERROR
-		currentList.append(dc_current)
+        analogValue = ADC.read_u16(analogInputPin)
+        sensor_voltage = (analogValue / 65535) * AREF
+        sensor_voltage = (sensor_voltage - DEFAULT_OUTPUT_VOLTAGE) * 1000
+        dc_current = (sensor_voltage / MILLIVOLT_PER_AMPERE) - ERROR
+        currentList.append(dc_current)
         sleep(0.003)
 	currentAvg = abs(sum(currentList) / len(currentList))
 	return currentAvg
@@ -27,23 +27,23 @@ def initSer(pin):
 
 
 def collaps():
-  	pointer.duty_ns(1500000)
-	middle.duty_ns(350000)
-	ring.duty_ns(1900000)
-	pinky.duty_ns(550000)
-	sleep(1)
-	thumb.duty_ns(1000000)
-	return True
+    pointer.duty_ns(1500000)
+    middle.duty_ns(350000)
+    ring.duty_ns(1900000)
+    pinky.duty_ns(550000)
+    sleep(1)
+    thumb.duty_ns(1000000)
+    return True
 
 
 def extend():
-	thumb.duty_ns(1700000)
-	sleep(1)
- 	pointer.duty_ns(2000000)
-	middle.duty_ns(2000000)
-	ring.duty_ns(350000)
-	pinky.duty_ns(2000000)
-	return False
+    thumb.duty_ns(1700000)
+    sleep(1)
+    pointer.duty_ns(2000000)
+    middle.duty_ns(2000000)
+    ring.duty_ns(350000)
+    pinky.duty_ns(2000000)
+    return False
 
 
 pointer = initSer(15)

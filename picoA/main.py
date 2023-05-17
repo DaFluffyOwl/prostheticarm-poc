@@ -22,57 +22,81 @@ def updateStream(xList, data):
 
 
 def currentSensor(pin):
-	AREF = 3.3 #internal voltage of RP2xxx
-	DEFAULT_OUTPUT_VOLTAGE = 5/2 #for when current is 0 on a unipolar psu is Vcc/2
-	MILLIVOLT_PER_AMPERE = 185 #mV/A output sensitivity for this particular sensro
-	ERROR = 0.26 #for Error, tune as needed
-	analogInputPin = ADC(pin) #Def ADC pin
-	currentList = [] #create a list for finding an average of 150 samples
-	for i in range(0, 150):
-		analogValue = ADC.read_u16(analogInputPin)
-		sensor_voltage = (analogValue / 65535) * AREF
-		sensor_voltage = (sensor_voltage - DEFAULT_OUTPUT_VOLTAGE) * 1000
-		dc_current = (sensor_voltage / MILLIVOLT_PER_AMPERE) - ERROR
-		currentList.append(dc_current)
-        sleep(0.003)
-	currentAvg = round(abs(sum(currentList) / len(currentList)), 2)
-	return currentAvg
+  AREF = 3.3 #internal voltage of RP2xxx
+  DEFAULT_OUTPUT_VOLTAGE = 5/2 #for when current is 0 on a unipolar psu is Vcc/2
+  MILLIVOLT_PER_AMPERE = 185 #mV/A output sensitivity for this particular sensro
+  ERROR = 0.26 #for Error, tune as needed
+  analogInputPin = ADC(pin) #Def ADC pin
+  currentList = [] #create a list for finding an average of 150 samples
+  for i in range(0, 150):
+    analogValue = ADC.read_u16(analogInputPin)
+    sensor_voltage = (analogValue / 65535) * AREF
+    sensor_voltage = (sensor_voltage - DEFAULT_OUTPUT_VOLTAGE) * 1000
+    dc_current = (sensor_voltage / MILLIVOLT_PER_AMPERE) - ERROR
+    currentList.append(dc_current)
+    sleep(0.003)
+  currentAvg = round(abs(sum(currentList) / len(currentList)), 2)
+  return currentAvg
 
 
 def initSer(pin):
-  servo = PWM(Pin(pin))
-  servo.freq(50)
-  return servo
+    servo = PWM(Pin(pin))
+    servo.freq(50)
+    return servo
 
 
+def currentSensor(pin):
+    AREF = 3.3  # internal voltage of RP2xxx
+    DEFAULT_OUTPUT_VOLTAGE = 5 / 2  # for when current is 0 on a unipolar psu is Vcc/2
+    MILLIVOLT_PER_AMPERE = 185  # mV/A output sensitivity for this particular sensro
+    ERROR = 0.26  # for Error, tune as needed
+    analogInputPin = ADC(pin)  # Def ADC pin
+    currentList = []  # create a list for finding an average of 150 samples
+    for i in range(0, 150):
+        analogValue = ADC.read_u16(analogInputPin)
+        sensor_voltage = ((analogValue / 65535) * AREF)
+        sensor_voltage = (sensor_voltage - DEFAULT_OUTPUT_VOLTAGE) * 1000
+        dc_current = (sensor_voltage / MILLIVOLT_PER_AMPERE) - ERROR
+        currentList.append(dc_current)
+    currentAvg = abs(sum(currentList) / len(currentList))
+    return currentAvg
 
 
 def extend():
-	middle.duty_ns(2000000)
-	ring.duty_ns(350000)
-	return False
+    pointer.duty_ns(2000000)
+    middle.duty_ns(2000000)
+    return True
+
+
+pointer = initSer(17)
+middle = initSer(14)
+
+def poiCollaps():
+    for nsec in range(pointer.duty_ns(), 400000, -20000):
+        poiSen = round(currentSensor(27), 3)
+        if poiSen > .8:
+            pointer.duty_ns((nsec - 1000))
+            print(poiSen)
+            print(pointer.duty_ns())
+            print("object grabbed")
+            break
+        else:
+            pointer.duty_ns(nsec)
+            print(pointer.duty_ns())
+            print(poiSen)
+    return True
 
 def midCollaps():
-  for nsec in range(middle.duty_ns(), 600000, -20000):
-      midSen = round(currentSensor(28), 2)
-      if midSen > 2:
-          middle.duty_ns((nsec - 10000))
-          break
-      else:
-          middle.duty_ns(nsec)
-  _thread.exit()
-  return True
-
-
-def ringCollaps():
-  for nsec in range(ring.duty_ns(), 2000000, 50000):
-      ringSen = round(currentSensor(27), 1)
-      if ringSen > 2:
-          ring.duty_ns((nsec - 10000))
-          break
-      else:
-          ring.duty_ns(nsec)
-  return True
+    for nsec in range(middle.duty_ns(), 400000, -20000):
+        midSen = round(currentSensor(28), 3)
+        if midSen > .8:
+            middle.duty_ns((nsec-1000))
+            print("object grabbed")
+        else:
+            middle.duty_ns(nsec)
+            print(middle.duty_ns())
+            print(midSen)
+    return True
 
 
 def getStream(xList, pin):
@@ -80,18 +104,13 @@ def getStream(xList, pin):
   for i in range(0, 100):
     sensor = ADC(Pin(pin))
     data = sensor.read_u16()
-    voltage = (data / 65535) * 3.3
+    voltage = round((data / 65535),3) * 3.3
     voltageList.append(voltage)
   voltageRMS = rms(voltageList)
   xList = updateStream(stream, voltageRMS)
   return xList
 
 
-pointer = initSer(15)
-middle = initSer(14)
-ring = initSer(17)
-pinky = initSer(14)
-thumb = initSer(16)
 handState = False
 stream = []
 stream = initStream(stream, 1)
@@ -101,11 +120,11 @@ while True:
   avg = sum(stream)/len(stream)
   avg = round(avg, 2)
   print(avg)
-  if avg > 2.29:
+  if avg > 2.4:
     if handState == False:
       uart1.write(b'1')
       _thread.start_new_thread(midCollaps, ())
-      ringCollaps()
+      poiCollaps()
       handState = True
     else:
       uart1.write(b'1')

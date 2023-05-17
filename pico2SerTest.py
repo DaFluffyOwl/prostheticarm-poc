@@ -8,10 +8,8 @@ def initSer(pin):
   return servo
 
 def extend():
-	pointer.duty_ns(2000000)
-	middle.duty_ns(350000)
-	ring.duty_ns(1900000)
-	pinky.duty_ns(2000000)
+	pinky.duty_ns(350000)
+	ring.duty_ns(350000)
 	sleep(1)
 	thumb.duty_ns(1000000)
 	return True
@@ -19,17 +17,13 @@ def extend():
 def collaps():
 	thumb.duty_ns(1500000)
 	sleep(1)
-	pointer.duty_ns(400000)
-	middle.duty_ns(2000000)
-	ring.duty_ns(350000)
-	pinky.duty_ns(550000)
+	pinky.duty_ns(2000000)
+	ring.duty_ns(1900000)
 	return False
 
 
 pinky = initSer(14)
-middle = initSer(15)
-ring = initSer(16)
-pointer = initSer(17)
+ring = initSer(15)
 thumb = initSer(18)
 
 sleep(2)

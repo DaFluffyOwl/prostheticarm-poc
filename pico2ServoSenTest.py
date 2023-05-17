@@ -1,5 +1,6 @@
-from machine import UART, Pin, PWM, ADC
+from machine import Pin, PWM, ADC
 from time import sleep
+import sys
 import _thread
 
 
@@ -11,15 +12,16 @@ def initSer(pin):
 def extend():
 	pinky.duty_ns(350000)
 	ring.duty_ns(350000)
+	sleep(1)
 	thumb.duty_ns(1500000)
-	return False
+	return True
 
 def collaps():
 	thumb.duty_ns(1500000)
 	sleep(1)
 	pinky.duty_ns(2000000)
 	ring.duty_ns(1900000)
-	return True
+	return False
 
 
 def currentSensor(pin):
@@ -54,7 +56,6 @@ def ringCollaps():
             print(ringSen)
     return True
 
-
 def pinkyCollaps():
     for nsec in range(pinky.duty_ns(), 2000000, 20000):
         pinkySen = round(currentSensor(26), 3)
@@ -66,7 +67,6 @@ def pinkyCollaps():
             print(pinky.duty_ns())
             print(pinkySen)
     return True
-
 
 def thumbCollaps():
     for nsec in range(thumb.duty_ns(), 400000, -20000):
@@ -80,18 +80,17 @@ def thumbCollaps():
             print(thumbSen)
     return True
 
-handState = False
-uart1 = UART(1, baudrate=115200, tx=Pin(4), rx=Pin(5), timeout=100)
-while True:
-    emg = str(uart1.read(1))
-    if '1' in emg:
-        print(emg)
-        if handState == False:
-            _thread.start_new_thread(pinkyCollaps, ())
-            ringCollaps()
-            thumbCollaps()
-            handState = True
-    elif '0' in emg:
-        print(emg)
-        extend()
-        handState = False
+print("closing")
+_thread.start_new_thread(ringCollaps, ())
+pinkyCollaps()
+thumbCollaps()
+sleep(5)
+print("opening")
+extend()
+sleep(2)
+sys.exit()
+
+#pointer works as intended
+#middle finger is opposite
+#ring finger works as intended change duty cycle to 1900000 for it to draw less current
+#pinky finger is opposite change duty cycle in extended from 350000 to 550000 to draw less current
